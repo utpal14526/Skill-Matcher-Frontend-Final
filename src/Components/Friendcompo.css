@@ -1,0 +1,20 @@
+.card-top {
+    height: 120px;
+    width: 120px;
+
+    position: absolute;
+    top: -70px;
+
+    left: 75px;
+    border-radius: 50%;
+}
+
+.card-img-top {
+    background-size: cover;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.card-body {
+    padding-top: 60px;
+}

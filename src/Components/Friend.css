@@ -1,0 +1,51 @@
+.tags {
+    border-radius: 4px;
+}
+
+.friends-container {
+    width: 100%;
+    height: 100%;
+    padding: 30px;
+    color: whitesmoke;
+
+}
+
+.card {
+    width: 20rem;
+    height: 15rem;
+}
+
+.modal-container {
+
+    height: 450px;
+    overflow: scroll;
+}
+
+.msg-container1 {
+    color: white;
+    background-color: #128C7E;
+    width: fit-content;
+    margin-top: 6px;
+    padding: 2px 5px;
+    border-radius: 5px;
+
+}
+
+.name {
+    font-size: 10px;
+}
+
+.msg-container2 {
+    color: white;
+    background-color: grey;
+    width: fit-content;
+    margin-top: 6px;
+    padding: 2px 5px;
+    border-radius: 5px;
+}
+
+@media (max-width:700px) {
+    .friends-container {
+        font-size: smaller;
+    }
+}

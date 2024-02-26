@@ -1,0 +1,28 @@
+.profile-conatiner {
+
+    width: 40%;
+    margin: auto;
+    padding: 10px;
+}
+
+.Tags {
+    background-color: greenyellow;
+    padding: 2px 2px;
+    border-radius: 4px;
+    cursor: pointer;
+
+}
+
+.Tags2 {
+    background-color: aqua;
+    padding: 2px 2px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+
+@media (max-width:600px) {
+    .profile-conatiner {
+        width: 90%;
+    }
+}

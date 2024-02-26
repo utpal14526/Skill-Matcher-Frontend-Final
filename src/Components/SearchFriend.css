@@ -1,0 +1,14 @@
+.SmallTags1 {
+    background-color: #87ceeb;
+    width: 23%;
+    margin-top: 20px;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .SmallTags1 {
+        width: 55%;
+    }
+}
