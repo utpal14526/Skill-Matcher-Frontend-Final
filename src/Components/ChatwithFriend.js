@@ -16,7 +16,7 @@ export default function Friends() {
     PORTFOLIOLINK: "",
   });
 
-  const host="https://skill-matcher1.onrender.com";
+  const host="http://localhost:5000";
 
   const [arrivalmessage, setArrivalmessage] = useState(null);
 

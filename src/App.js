@@ -1,44 +1,43 @@
 import "./App.css";
-// import { Button, ButtonGroup } from '@chakra-ui/react'
-import { useEffect } from "react";
-import { BrowserRouter as Router,Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./Components/Home";
-// import Chat from "./Components/Chat";
 import CustomNavbar from "./Components/Navbar";
 import Profile from "./Components/Profile";
 import Friends from "./Components/Friends";
 import SearchFriend from "./Components/SearchFriend";
-// import SkillState from "./Components/Skiils/SkillState";
+import PrimaryHome from './Components/PrimaryHome'
+import Private from './AuthenticationRoutes/Private'
+import PageNotFound from "./Components/PageNotFound";
+import BoostYourProfile from './Components/BoostYourProfile'
+import Notification from './Components/Notification'
+import TalkWithFriends from './Components/TalkWithFriends'
+import TalkWithFriendsPage from './Components/TalkWithFriendsPage'
+import FullProfilePage from './Components/FullProfilePage'
 
 function App() {
-  // useEffect(() => {
-  //   localStorage.removeItem("token");
-  // }, []);
-
   return (
     <>
-      {/* <SkillState> */}
+      <div className="App ">
+        <Routes>
+          <Route exact path="/login" element={<Home />} />
+          <Route exact path="/boostprofile" element={<BoostYourProfile />} />
 
-  
-        <div className="App ">
+          FullProfilePage
 
-        
-
-        <Router>
-
-          
-          <CustomNavbar/>
-
-          <Routes>
-            <Route exact path="/" element={<Home />} />
-            {/* <Route exact path="chats" element={<Chat />} /> */}
+          <Route path="/" element={<Private />}>
+            <Route exact path="/" element={<PrimaryHome />} />
             <Route exact path="/profile" element={<Profile />} />
-            <Route exact path="/friend" element={<Friends/>} />
+            <Route exact path="/friend" element={<TalkWithFriends />} />
             <Route exact path="/serachfriend" element={<SearchFriend />} />
-          </Routes>
-        </Router>
-        </div>
-      {/* </SkillState> */}
+            <Route path="/notifications/*" element={<Notification />} />
+            <Route path="/talkwithfriends" element={<TalkWithFriends />} />
+            <Route path="/chat/:USERID" element={<TalkWithFriendsPage />} />
+            <Route exact path="/seeProfile/:USERID" element={<FullProfilePage />} />
+          </Route>
+
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+      </div>
     </>
   );
 }

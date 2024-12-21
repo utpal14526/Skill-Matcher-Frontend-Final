@@ -1,22 +1,31 @@
-
 import { React, useState, useEffect, useContext } from "react";
 import "./Profile.css";
+// import CustomNavbar from "./Navbar";
+import { Select, Radio } from 'antd';
+import Layout from "./Layout";
+import { toast } from 'react-toastify';
+import axios from 'axios';
+import 'react-toastify/dist/ReactToastify.css';
+
 export default function Profile() {
 
-  let arr = ["React","Html","Css","Nodejs","Flask", "Kotlin","ML", "MongoDb","Sql","Spring"];
+  let arr = ["React", "Html", "Css", "Nodejs", "Flask", "Kotlin", "ML", "MongoDb", "Sql", "Spring"];
 
-  
+
   const [details, setDetails] = useState({
     name: "",
+    USERID: "",   // this should be come from a different point 
     COLLEGENAME: "",
     YEAROFGRADUATION: "",
     LINKEDINID: "",
     PORTFOLIOLINK: "",
-    SELECTINTERESTS: [],
-    PROFILELINK: "",
+
   });
 
-  const host = "https://skill-matcher1.onrender.com";
+  const [photo, setPhoto] = useState("");
+
+
+  const host = "http://localhost:5000";
 
   const fetchcurprofile = async () => {
     const response = await fetch(`${host}/api/fetchcurprofile`, {
@@ -27,11 +36,15 @@ export default function Profile() {
       },
     });
 
+
+
     const json = await response.json();
+    console.log(json);
 
     if (json) {
       setDetails(json);
-      console.log(json.SELECTINTERESTS);
+      setYear(json.YEAROFGRADUATION);
+      setCollegename(json.COLLEGENAME);
     }
 
     return;
@@ -52,284 +65,299 @@ export default function Profile() {
 
   const [showAlert, setShowAlert] = useState(false);
 
-  const handleClick = async (e) => {
+  const [year, setYear] = useState(0);         // radio will store my year 
+  const [collegename, setCollegename] = useState('');
+
+  const handleClick = async (e, id) => {
     e.preventDefault();
 
-    console.log(details);
-    const response = await fetch(`${host}/api/profileupdate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "auth-token": localStorage.getItem("token"),
-      },
+    // formData
 
-      body: JSON.stringify(details),
-    });
 
-    const json = await response.json();
+    const profileData = new FormData();
+    profileData.append('name', details.name);
+    profileData.append('COLLEGENAME', collegename);
+    profileData.append('YEAROFGRADUATION', year);
+    profileData.append('LINKEDINID', details.LINKEDINID);
+    profileData.append('PORTFOLIOLINK', details.PORTFOLIOLINK);
+    profileData.append('USERID', details.USERID);
+    profileData.append('photo', photo);
 
-    setDetails(json);
 
-    setShowAlert(true);
-    const timer = setTimeout(() => {
-      setShowAlert(false);
-    }, 1300);
 
-    return () => {
-      clearTimeout(timer);
-    };
-  };
+    // const response = await fetch(`${host}/api/profileupdate`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     "auth-token": localStorage.getItem("token"),
+    //   },
 
-  // details.
-  // for chosing things
+    //   body: JSON.stringify(details),
+    // });
 
-  const handletags = async (e) => {
-    console.log(e);
-    const b = details.SELECTINTERESTS;
-    let idx = b.indexOf(e);
+    console.log(details.name);
+    console.log(details.USERID);
 
-    if (idx == -1) {
-      b.push(e);
-    } else {
-      b.splice(idx, 1);
+    const { data } = await axios.post(`${host}/api/profileupdate`, profileData,
+      {
+        headers: {
+          'auth-token': localStorage.getItem('token'),
+        }
+      }
+    );
+
+    console.log(data);
+
+    if (data?.success) {
+
+      toast.success(data?.message);
+
+    }
+    else {
+      toast.error('Something Went Wrong');
     }
 
-    setDetails({
-      ...details,
-      SELECTINTERESTS: b,
-    });
-
-    // console.log(details);
-
-
   };
 
-  function convertTobase64(file) {
-    return new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-      fileReader.onload = () => {
-        resolve(fileReader.result);
-      };
-      fileReader.onerror = (error) => {
-        reject(error);
-      };
-    });
-  }
 
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    const base64 = await convertTobase64(file);
 
-    setDetails({
-      ...details,
-      PROFILELINK: base64,
-    });
-  };
+  // new thing implementin g 
 
-  let a="UTPAL";
+
+
+  const years = [
+    { year: '2020', id: 0, value: 2020 },
+    { year: '2021', id: 1, value: 2021 },
+    { year: '2022', id: 2, value: 2022 },
+    { year: '2023', id: 3, value: 2023 },
+    { year: '2024', id: 4, value: 2024 },
+    { year: '2025', id: 5, value: 2025 },
+    { year: '2026', id: 6, value: 2026 },
+    { year: '2027', id: 7, value: 2027 },
+  ];
+
+  const colleges = [
+    { clg: 'DTU', id: 0 },
+    { clg: 'NSUT', id: 1 },
+    { clg: 'IITD', id: 2 },
+    { clg: 'NIT', id: 3 },
+    { clg: 'IITD', id: 4 },
+    { clg: 'MAIT', id: 5 },
+    { clg: 'Amity University', id: 6 }
+  ];
+
+
 
   return (
     <>
 
-      {showAlert && (
-        <div class="alert alert-primary fixed-top font-bold" role="alert">
-          Changes Saved Successfully !
-        </div>
-      )}
-      {/* {localStorage.getItem("ID")} */}
+      <Layout>
 
-      <div className="profile-conatiner">
-      <div
-        class="modal fade"
-        id="exampleModal"
-        tabindex="-1"
-        role="dialog"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog  " role="document   ">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title  font-extrabold" id="exampleModalLabel">
-                SELECT YOUR SKILLS
-              </h5>
-              <button
-                type="button"
-                class="close"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
 
-           
-            <div class="modal-body d-flex flex-start flex-wrap   ">
-              {arr.map((ele) => {
-                return (
-                  // do cheiche ho jayegi
-                  details.SELECTINTERESTS.includes(ele) ? (
-                    <div
-                      className="Tags mx-2 px-1 py-0.5 w-1/5 font-bold my-3"
-                      onClick={() => {
-                        
-                        handletags(ele);
-                      }}
-                    >
-                     
-                      {ele}
-                    </div>
-                  ) : (
-                    <div
-                      className="Tags2 mx-2 px-1 py-0.5 w-1/5 font-bold my-3"
-                      onClick={() => {
-                        handletags(ele);
-                      }}
-                    >
-                      {ele}
-                    </div>
-                  )
-                );
-              })}
-            </div>
+        <div className="profile-container">
 
-            <div className="d-flex flex-start flex-wrap mx-3">
-              <div className="Tags mx-2 px-1 py-0.5 w-1/3 font-bold my-3 ">
-                Already-Selected
-              </div>
-              <div className="Tags2 mx-2 px-1 py-0.5 w-1/3 font-bold my-3  bg-sky-400">
-                Not-Selected
+
+          {/* Modals */}
+
+
+          <div style={{ width: '500px' }} className="form-container  mt-5 profile-internal-container my-5">
+            <div className='d-flex flex-row justify-content-between  '>
+              <h2 className="font-bold">Your Profile</h2>
+              <div>
+                {photo ? (
+                  <div className='text-center'>
+                    <img
+                      src={URL.createObjectURL(photo)}
+                      alt='product_photo'
+                      className='img img-responsive'
+                      height={'80px'}
+                      width={'80px'}
+                    />
+                  </div>
+                ) : (
+                  <div className='text-center'>
+                    <img
+                      src={`${host}/api/profilephoto/${details.USERID}`}
+                      alt='product_photo'
+                      className='img img-responsive'
+                      height={'80px'}
+                      width={'80px'}
+                    />
+                  </div>
+                )}
               </div>
             </div>
+            <form>
+              <div className="mb-4">
+                <label htmlFor="name" className="profile-label form-label ">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="name"
+                  placeholder="Enter your name"
+                  value={details.name}
+                  style={{
+                    borderRadius: '5px'
+                  }}
+                  onChange={handleChange}
+                />
+              </div>
 
-            <div class="modal-footer">
+
+              <div className="mb-4">
+                <label htmlFor="college" className="profile-label form-label ">
+                  College Name
+                </label>
+                {/* <input
+                  type="text"
+                  className="form-control"
+                  id="COLLEGENAME"
+                  placeholder="Enter your college name"
+                  value={details.COLLEGENAME}
+                  style={{
+                    borderRadius: '5px'
+                  }}
+                  onChange={handleChange}
+                /> */}
+
+
+                <Select
+                  variant={false}
+                  placeholder='Select College'
+                  size='large'
+                  showSearch
+                  className='form-select mb-3'
+                  value={collegename}
+                  onChange={(value) => { setCollegename(value) }}
+                >
+                  {colleges.map((ele) => (
+                    <Select.Option key={ele.id} value={ele.clg}>
+                      {ele.clg}
+                    </Select.Option>
+                  ))}
+                </Select>
+
+
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="graduation" className="profile-label form-label half-border-bottom">
+                  Year of Graduation
+                </label>
+
+                {/* <input
+                  type="text"
+                  className="form-control"
+                  id="YEAROFGRADUATION"
+                  placeholder="Enter year of graduation"
+                  min="1900"
+                  max="2100"
+                  value={details.YEAROFGRADUATION}
+                  onChange={handleChange}
+                  style={{
+                    borderRadius: '5px'
+                  }}
+                /> */}
+
+                <Select
+                  variant={false}
+                  placeholder='Select Year'
+                  size='large'
+                  showSearch
+                  className='form-select mb-3'
+                  value={year}
+                  onChange={(value) => {
+                    console.log(value); setYear(value)
+                  }}
+                >
+                  {years.map((ele) => (
+                    <Select.Option key={ele.id} value={ele.value}>
+                      {ele.year}
+                    </Select.Option>
+                  ))}
+                </Select>
+
+
+              </div>
+              <div className="mb-4">
+                <label htmlFor="linkedin" className="profile-label form-label ">
+                  LinkedIn ID
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="LINKEDINID"
+                  placeholder="Enter your LinkedIn ID"
+                  value={details.LINKEDINID}
+                  style={{
+                    borderRadius: '5px'
+                  }}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="portfolio" className="profile-label form-label ">
+                  Portfolio Link
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="PORTFOLIOLINK"
+                  placeholder="Enter your portfolio link"
+                  value={details.PORTFOLIOLINK}
+                  style={{
+                    borderRadius: '5px'
+                  }}
+                  onChange={handleChange}
+                />
+              </div>
+
+
+
+
+              <div className="mb-4">
+                <label htmlFor="college" className=" profile-label form-label ">
+                  Choose Profile Picture
+                </label>
+                <input
+
+                  type='file'
+                  name="photo"
+                  accept="image/*"
+                  onChange={(e) => {
+                    console.log(e.target.files[0]); // Log the file to ensure it's being selected
+                    setPhoto(e.target.files[0]);
+                  }}
+                  className="form-control"
+
+                  style={{
+                    borderRadius: '5px'
+                  }}
+
+                />
+              </div>
+
+
               <button
-                type="button"
-                class="btn btn-secondary"
-                data-dismiss="modal"
+                type="submit"
+                style={{
+                  borderRadius: '5px'
+                }}
+
+                className="font-bold form-control mt-2 btn btn-primary "
+                onClick={handleClick}
               >
-                Close
+                Save Changes
               </button>
-            </div>
+            </form>
           </div>
         </div>
-      </div>
 
-      
-      {/* Modals */}
-      <div className="form-container my-5">
-        <h1 className="font-bold">Your Profile</h1>
-        <form>
-          <div className="mb-3">
-            <label htmlFor="name" className="form-label text-light">
-              Name
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="name"
-              placeholder="Enter your name"
-              value={details.name}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="college" className="form-label text-light">
-              College Name
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="COLLEGENAME"
-              placeholder="Enter your college name"
-              value={details.COLLEGENAME}
-              onChange={handleChange}
-            />
-          </div>
+      </Layout>
 
-          <div className="mb-3">
-            <label htmlFor="graduation" className="form-label text-light">
-              Year of Graduation
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="YEAROFGRADUATION"
-              placeholder="Enter year of graduation"
-              min="1900"
-              max="2100"
-              value={details.YEAROFGRADUATION}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="linkedin" className="form-label text-light">
-              LinkedIn ID
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="LINKEDINID"
-              placeholder="Enter your LinkedIn ID"
-              value={details.LINKEDINID}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="portfolio" className="form-label text-light">
-              Portfolio Link
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="PORTFOLIOLINK"
-              placeholder="Enter your portfolio link"
-              value={details.PORTFOLIOLINK}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-3">
-            <label htmlFor="college" className="form-label text-light">
-              Choose Profile Picture
-            </label>
-            <input
-              type="file"
-              lable="Image"
-              name="myFile"
-              id="file-upload"
-              className="form-control"
-              accept=".jpeg ,.png ,.jpg"
-              onChange={(e) => handleFileChange(e)}
-            />
-          </div>
-
-          <div className="mb-3">
-            <label htmlFor="interests" className="form-label text-light">
-              Interests
-            </label>
-            <select
-              className="form-select"
-              id="interests"
-              data-toggle="modal"
-              data-target="#exampleModal"
-            >
-              <option selected disabled>
-                Select your interests
-              </option>
-            </select>
-          </div>
-          <button
-            type="submit"
-            className="font-bold btn btn-primary "
-            onClick={handleClick}
-          >
-            Save Changes
-          </button>
-        </form>
-      </div>
-      </div>
     </>
+
   );
 }
